@@ -12,7 +12,7 @@
  *
  */
 
-import {default as KeyboardService, KEYINFO, HID_MODIFIERS} from "keyboardService";
+import {default as KeyboardService, HID_MODIFIERS} from "keyboardService";
 import Modules from "modules";
 
 const BLUE = "blue";
@@ -27,7 +27,7 @@ class MediaBehavior extends Behavior {
 
     if (Modules.has("UI")) {
       globalThis.modExport = Modules.importNow("UI");
-      this.UI = new modExport.container({hidKeys: KEYINFO, modifiers: HID_MODIFIERS})
+      this.UI = new modExport.container({modifiers: HID_MODIFIERS})
       application.add(this.UI);
     } else {
       application.add(new NoModUI());
@@ -35,23 +35,53 @@ class MediaBehavior extends Behavior {
 
     this.ble = new KeyboardService({
       onKeyboardBound: () => {
-        if (this.UI !== undefined)
+        if (this.UI)
           this.UI.delegate("onKeyboardBound");
       },
       onKeyboardUnbound: () => {
-        if (this.UI !== undefined)
+        if (this.UI)
           this.UI.delegate("onKeyboardUnbound");
       }
     });
-  }
-  doKeyDown(application, options){
-    this.ble.onKeyDown(options);
-  }
-  doKeyUp(application, options) {
-    this.ble.onKeyUp(options);
-  }
-  doKeyTap(application, options) {
-    this.ble.onKeyTap(options);
+
+    {
+      const _ble = this.ble;
+      const a = globalThis.button?.a;
+      const b = globalThis.button?.b;
+      const c = globalThis.button?.c;
+      if (a) {
+        a.onChanged = function() {
+          const up = this.read();
+          if (up === 0) {
+            return;
+          }
+          _ble.setAxis(6, 0.5);
+          _ble.setAxis(7, -0.5);
+          _ble.setButton(0, 1);
+          _ble.setHat(0, 2);
+        };
+      }
+      if (b) {
+        b.onChanged = function() {
+          const up = this.read();
+          if (up === 0) {
+            return;
+          }
+          _ble.setAxis(0, -0.5);
+          _ble.setButton(1, 1);
+          _ble.setHat(1, 4);
+        };
+      }
+      if (c) {
+        c.onChanged = function() {
+          const up = this.read();
+          if (up === 0) {
+            return;
+          }
+          trace(`c up`);
+        }
+      }
+    }
   }
   
 }

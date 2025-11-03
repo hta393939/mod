@@ -8,7 +8,7 @@
 				"type": "String",
 				"permissions": "read",
 				"properties": "read",
-				"value": "Moddable Media"
+				"value": "Moddable Me"
 			},
 			"appearance": {
 				"uuid": "2A01",
@@ -16,7 +16,7 @@
 				"type": "Uint16",
 				"permissions": "read",
 				"properties": "read",
-				"value": 961
+				"value": 964
 			}
 		}
 	}

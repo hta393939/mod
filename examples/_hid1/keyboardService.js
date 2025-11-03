@@ -15,9 +15,7 @@
 import BLEServer from "bleserver";
 import { uuid } from "btutils";
 import {HIDKeyboard, HID_MODIFIERS} from "hidkeyboard";
-import {HIDMedia, KEYINFO} from "hidmedia";
-
-const domain = "BLEKB";
+import {HIDMedia} from "hidmedia";
 
 class KeyboardService extends BLEServer {
   constructor(options) {
@@ -31,11 +29,11 @@ class KeyboardService extends BLEServer {
     this.unboundCallback = options.onKeyboardUnbound;
   }
   onReady() {
-    this.deviceName = "Mohid1";
+    this.deviceName = "Mhid1";
     this.securityParameters = { encryption: true, bonding: true };
 
-    this.keyboardReportCharacteristic = undefined;
-    this.mediaReportCharacteristic = undefined;
+    this.keyboardReportCharacteristic = null;
+    this.mediaReportCharacteristic = null;
     this.onDisconnected();
   }
   onConnected() {
@@ -43,17 +41,18 @@ class KeyboardService extends BLEServer {
   }
   onDisconnected() {
     this.unboundCallback?.();
-    this.mediaReportCharacteristic = undefined;
-    this.keyboardReportCharacteristic = undefined;
+    this.mediaReportCharacteristic = null;
+    this.keyboardReportCharacteristic = null;
     this.startAdvertising({
       advertisingData: { flags: 6, completeName: this.deviceName,
-        incompleteUUID16List:[uuid`1812`, uuid`180f`], appearance: 961 }
+        incompleteUUID16List:[uuid`1812`, uuid`180f`],
+        appearance: 964 } // 961 HID Keyboard, 964 HID Gamepad
     });
   }
   onCharacteristicNotifyEnabled(characteristic) {
-    if ("media_input_report" == characteristic.name) {
+    if ("pad_input_report" == characteristic.name) {
       this.mediaReportCharacteristic = characteristic;
-      trace(`media report bound by request\n`);
+      trace(`pad report bound by request\n`);
       if (!this.bound) {
         this.bound = true;
         this.boundCallback?.();
@@ -67,7 +66,7 @@ class KeyboardService extends BLEServer {
       }
     } else if ("battery" == characteristic.name) {
       this.batteryCharacteristic = characteristic;
-      this.notifyValue(this.batteryCharacteristic, 85);
+      this.notifyValue(this.batteryCharacteristic, 39);
     } else {
       trace(`request to bind characteristic: ${JSON.stringify(characteristic)}\n`);
     }
@@ -75,12 +74,10 @@ class KeyboardService extends BLEServer {
   /** キャラクタ読み取り要求があったときの動作 */
   onCharacteristicRead(characteristic) {
     switch (characteristic.name){
-      case "media_input_report":
+      case "pad_input_report":
         return this.media.report;
       case "keyboard_input_report":
         return this.keyboard.report;
-      case 'pad_input_report':
-        return [0]; // 未実装
       case "control_point":
         return [0,0];
       default:
@@ -94,38 +91,43 @@ class KeyboardService extends BLEServer {
     else
       trace(`not connected ${this.keyboard.report}`);
   }
+  /** API */
   notifyMedia() {
     if (this.mediaReportCharacteristic)
       this.notifyValue(this.mediaReportCharacteristic, this.media.report);
     else
       trace(`not connected: ${this.media.report}\n`);
   }
-  onKeyUp(options) {
-    if (this.media.canHandle(options)) {
-      this.media.onKeyUp(options);
-      this.notifyMedia();
-    }
-    
+  onKeyUp(options) {    
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyUp(options);
       this.notifyKeyboard();
     }
   }
-  onKeyDown(options) {
-    if (this.media.canHandle(options)) {
-      this.media.onKeyDown(options);
-      this.notifyMedia();
-    }
-    
+  onKeyDown(options) { 
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyDown(options);
       this.notifyKeyboard();
     }
   }
-  onKeyTap(options) {
-    this.onKeyDown(options);
-    this.onKeyUp(options);
+
+  setPNAxis(index, inval) {
+    this.media?.setPNAxis(index, inval);
+    this.notifyMedia();
   }
+  setAxis(index, inval) {
+    this.media?.setAxis(index, inval);
+    this.notifyMedia();
+  }
+  setButton(index, down) {
+    this.media?.setButton(index, down);
+    this.notifyMedia();
+  }
+  setHat(index, val) {
+    this.media?.setHat(index, val);
+    this.notifyMedia();
+  }
+
 }
 
-export { KeyboardService as default, KEYINFO, HID_MODIFIERS };
+export { KeyboardService as default, HID_MODIFIERS };

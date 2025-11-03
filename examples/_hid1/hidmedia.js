@@ -12,49 +12,83 @@
  *
  */
 
-const KEYINFO = Object.freeze({
-  VOLUME_UP:      {HID: {page: 0x0C, id: 0xE9}, report: 0b00000001},
-  VOLUME_DOWN:    {HID: {page: 0x0C, id: 0xEA}, report: 0b00000010},
-  MUTE:           {HID: {page: 0x0C, id: 0x7F}, report: 0b00000100},
-  BACK:           {HID: {page: 0x0C, id: 0xB6}, report: 0b00001000},
-  FORWARD:        {HID: {page: 0x0C, id: 0xB5}, report: 0b00010000},
-  PLAY:           {HID: {page: 0x0C, id: 0xB0}, report: 0b00100000},
-  PLAYPAUSE:      {HID: {page: 0x0C, id: 0xCD}, report: 0b01000000},
-  SHUFFLE:        {HID: {page: 0x0C, id: 0xB9}, report: 0b10000000}
-}, true);
-
-function getMask(hidValue) {
-  for (let k in KEYINFO)
-    if (hidValue == KEYINFO[k].HID.id)
-      return KEYINFO[k].report;
-
-  return undefined;
-}
-
 class HIDMedia {
+  static SLIDER_MAX = 65532;
+  static PN_MAX = 32767;
+  static UPN_OFFSET = 32768;
+  static UPN_MAX = 65535;
+
   constructor() {
-    /** 1バイト */
-    this.report = Uint8Array.from([0]);
+    /** 22バイト */
+    this.report = new Uint8Array(22);
   }
+
   /**
-   * ハンドルできるかどうか
-   * @param {*} options 
+   * 
+   * @param {number} index 0 - 5
+   * @param {number} inval -1.0 - +1.0 
+   */
+  setPNAxis(index, inval) {
+    if (index < 0 || index > 5) {
+      return;
+    }
+    let val16 = Math.floor(inval * HIDMedia.PN_MAX) + HIDMedia.UPN_OFFSET;
+    val16 = Math.max(0, Math.min(HIDMedia.UPN_MAX, val16));
+    this.report[3 + index * 2] = val16 & 0xff;
+    this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
+  }
+
+  /**
+   * 
+   * @param {number} index 6 - 8
+   * @param {number} inval 0.0 - 1.0
    * @returns 
    */
-  canHandle(options) {
-    if (options.hidCode?.page === 0x0C && getMask(options.hidCode.id) != undefined)
-      return true;
-    else
-      return false;
+  setAxis(index, inval) {
+    if (index < 6 || index > 8) {
+      return;
+    }
+    let val16 = Math.floor(inval * HIDMedia.SLIDER_MAX);
+    val16 = Math.max(0, Math.min(HIDMedia.SLIDER_MAX, val16));
+    this.report[3 + index * 2] = val16 & 0xff;
+    this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
   }
 
-  onKeyUp(options) {
-    this.report[0] &= ~getMask(options.hidCode.id);
+  /**
+   * 
+   * @param {number} index 0-1
+   * @param {number} val 0-15
+   */
+  setHat(index, val) {
+    if (index < 0 || index >= 2) {
+      return;
+    }
+    let val8 = this.report[21];
+    if (index === 0) {
+      val8 = (val8 & 0xf0) | val;
+    } else {
+      val8 = (val8 & 0x0f) | (val << 4);
+    }
+    this.report[21] = val;
   }
 
-  onKeyDown(options) {
-    this.report[0] |= getMask(options.hidCode.id);
+  /**
+   * 
+   * @param {number} index 0 から 23 
+   * @param {number} down 0 - 1
+   */
+  setButton(index, down) {
+    if (index < 0 || index >= 24) {
+      return;
+    }
+    const mod = index & 7;
+    const index8 = (index >> 8);
+    const shift = mod;
+    let val = this.report[index8];
+    val = val & (0xff ^ (1 << shift));
+    this.report[index8] = val | (down << shift);
   }
+
 }
 
-export {HIDMedia, KEYINFO};
+export {HIDMedia};

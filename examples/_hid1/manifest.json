@@ -35,5 +35,18 @@
 		"keyboardService",
 		"hidkeyboard",
 		"hidmedia"
-	]
+	],
+	"platforms": {
+		"lin": {
+			"config": {
+				"rotation": 0
+			}
+		},
+		"esp32": {
+			"config": {
+				"rotation": 90,
+				"startupSound": false
+			}
+		}
+	}
 }
