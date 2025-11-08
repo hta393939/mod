@@ -4,11 +4,11 @@
 		"characteristics": {
 			"manufacturer": {
 				"uuid": "2A29",
-				"maxBytes": 6,
+				"maxBytes": 7,
 				"type": "String",
 				"permissions": "readEncrypted",
 				"properties": "read",
-				"value": "Moddab"
+				"value": "_hacont"
 			},
 			"PnP_ID": {
 				"uuid": "2A50",

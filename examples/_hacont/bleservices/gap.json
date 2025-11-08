@@ -4,11 +4,11 @@
 		"characteristics": {
 			"device_name": {
 				"uuid": "2A00",
-				"maxBytes": 11,
+				"maxBytes": 8,
 				"type": "String",
 				"permissions": "read",
 				"properties": "read",
-				"value": "Moddable Me"
+				"value": "_hacontr"
 			},
 			"appearance": {
 				"uuid": "2A01",

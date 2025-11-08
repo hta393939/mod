@@ -29,7 +29,7 @@ class KeyboardService extends BLEServer {
     this.unboundCallback = options.onKeyboardUnbound;
   }
   onReady() {
-    this.deviceName = "Mhid1";
+    this.deviceName = "_hacontrol";
     this.securityParameters = { encryption: true, bonding: true };
 
     this.keyboardReportCharacteristic = null;
@@ -66,7 +66,7 @@ class KeyboardService extends BLEServer {
       }
     } else if ("battery" == characteristic.name) {
       this.batteryCharacteristic = characteristic;
-      this.notifyValue(this.batteryCharacteristic, 39);
+      this.notifyValue(this.batteryCharacteristic, 100);
     } else {
       trace(`request to bind characteristic: ${JSON.stringify(characteristic)}\n`);
     }

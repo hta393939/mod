@@ -8,7 +8,7 @@
 				"type": "Uint8",
 				"permissions": "readEncrypted",
 				"properties": "read,notify",
-				"value": 85
+				"value": 10
 			}
 		}
 	}
