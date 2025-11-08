@@ -14,14 +14,14 @@
 
 import BLEServer from "bleserver";
 import { uuid } from "btutils";
-import {HIDKeyboard, HID_MODIFIERS} from "hidkeyboard";
+import {HIDKeyboard} from "hidkeyboard";
 import {HIDMedia} from "hidmedia";
 
 class KeyboardService extends BLEServer {
   constructor(options) {
     super(options);
 
-    this.keyboard = new HIDKeyboard();
+    this.consumerMedia = new HIDKeyboard();
     this.media = new HIDMedia();
     this.bound = false;
 
@@ -29,10 +29,11 @@ class KeyboardService extends BLEServer {
     this.unboundCallback = options.onKeyboardUnbound;
   }
   onReady() {
-    this.deviceName = "_hacontrol";
+    this.deviceName = "_boxcontroller";
+    //this.deviceName = "_hacontrol";
     this.securityParameters = { encryption: true, bonding: true };
 
-    this.keyboardReportCharacteristic = null;
+    this.consumerMediaReportCharacteristic = null;
     this.mediaReportCharacteristic = null;
     this.onDisconnected();
   }
@@ -57,8 +58,8 @@ class KeyboardService extends BLEServer {
         this.bound = true;
         this.boundCallback?.();
       }
-    } else if ("keyboard_input_report" == characteristic.name) {
-      this.keyboardReportCharacteristic = characteristic;
+    } else if ("consumermedia_input_report" == characteristic.name) {
+      this.consumerMediaReportCharacteristic = characteristic;
       trace(`keyboard report bound by request\n`);
       if (!this.bound) {
         this.bound = true;
@@ -76,8 +77,8 @@ class KeyboardService extends BLEServer {
     switch (characteristic.name){
       case "pad_input_report":
         return this.media.report;
-      case "keyboard_input_report":
-        return this.keyboard.report;
+      case "consumermedia_input_report":
+        return this.consumerMedia.report;
       case "control_point":
         return [0,0];
       default:
@@ -85,11 +86,12 @@ class KeyboardService extends BLEServer {
         break;
     }
   }
-  notifyKeyboard() {
-    if (this.keyboardReportCharacteristic)
-      this.notifyValue(this.keyboardReportCharacteristic, this.keyboard.report);
+  notifyConsumerMedia() {
+    if (this.consumerMediaReportCharacteristic)
+      this.notifyValue(this.consumerMediaReportCharacteristic,
+      this.consumerMedia.report);
     else
-      trace(`not connected ${this.keyboard.report}`);
+      trace(`not connected ${this.consumerMedia.report}`);
   }
   /** API */
   notifyMedia() {
@@ -98,23 +100,7 @@ class KeyboardService extends BLEServer {
     else
       trace(`not connected: ${this.media.report}\n`);
   }
-  onKeyUp(options) {    
-    if (this.keyboard.canHandle(options)) {
-      this.keyboard.onKeyUp(options);
-      this.notifyKeyboard();
-    }
-  }
-  onKeyDown(options) { 
-    if (this.keyboard.canHandle(options)) {
-      this.keyboard.onKeyDown(options);
-      this.notifyKeyboard();
-    }
-  }
 
-  setPNAxis(index, inval) {
-    this.media?.setPNAxis(index, inval);
-    this.notifyMedia();
-  }
   setAxis(index, inval) {
     this.media?.setAxis(index, inval);
     this.notifyMedia();
@@ -123,11 +109,11 @@ class KeyboardService extends BLEServer {
     this.media?.setButton(index, down);
     this.notifyMedia();
   }
-  setHat(index, val) {
-    this.media?.setHat(index, val);
+  setHat(val) {
+    this.media?.setHat(val);
     this.notifyMedia();
   }
 
 }
 
-export { KeyboardService as default, HID_MODIFIERS };
+export { KeyboardService as default };

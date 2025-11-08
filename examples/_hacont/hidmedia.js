@@ -13,80 +13,69 @@
  */
 
 class HIDMedia {
-  static SLIDER_MAX = 65532;
-  static PN_MAX = 32767;
-  static UPN_OFFSET = 32768;
-  static UPN_MAX = 65535;
+  static XY_MAX = 65535;
+  static Z_MAX = 1023;
 
   constructor() {
-    /** 22バイト */
-    this.report = new Uint8Array(22);
+    /** 17バイト */
+    this.report = new Uint8Array(17);
+
+    // X,X,Y,Y,Rx,Rx,Ry,Ry,Z,Z,Rz,Rz: 12バイト
+    // b,b,h: 3バイト
+    // system ctrl system main menu: 1バイト
+    // battery strength: 1バイト
+    this.report[16] = 0x02;
+    // 計17バイト
+
+    // output
+    // 1バイト
+    // 4バイト
+    // 1,1,1バイト
+    // 計8バイト
   }
 
   /**
    * 
    * @param {number} index 0 - 5
-   * @param {number} inval -1.0 - +1.0 
-   */
-  setPNAxis(index, inval) {
-    if (index < 0 || index > 5) {
-      return;
-    }
-    let val16 = Math.floor(inval * HIDMedia.PN_MAX) + HIDMedia.UPN_OFFSET;
-    val16 = Math.max(0, Math.min(HIDMedia.UPN_MAX, val16));
-    this.report[3 + index * 2] = val16 & 0xff;
-    this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
-  }
-
-  /**
-   * 
-   * @param {number} index 6 - 8
    * @param {number} inval 0.0 - 1.0
    * @returns 
    */
   setAxis(index, inval) {
-    if (index < 6 || index > 8) {
+    if (index < 0 || index > 5) {
       return;
     }
-    let val16 = Math.floor(inval * HIDMedia.SLIDER_MAX);
-    val16 = Math.max(0, Math.min(HIDMedia.SLIDER_MAX, val16));
-    this.report[3 + index * 2] = val16 & 0xff;
-    this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
+    let max = (index >= 4) ? HIDMedia.Z_MAX : HIDMedia.XY_MAX;
+    let val16 = Math.floor(inval * max);
+    val16 = Math.max(0, Math.min(max, val16));
+    this.report[index * 2] = val16 & 0xff;
+    this.report[index * 2 + 1] = (val16 >> 8) & 0xff; 
   }
 
   /**
-   * 
-   * @param {number} index 0-1
-   * @param {number} val 0-15
+   * 45度ずつ
+   * @param {number} val 1-8
    */
-  setHat(index, val) {
-    if (index < 0 || index >= 2) {
-      return;
-    }
-    let val8 = this.report[21];
-    if (index === 0) {
-      val8 = (val8 & 0xf0) | val;
-    } else {
-      val8 = (val8 & 0x0f) | (val << 4);
-    }
-    this.report[21] = val;
+  setHat(val) {
+    let val8 = this.report[14];
+    val8 = (val8 & 0xf0) | val;
+    this.report[14] = val;
   }
 
   /**
    * 
-   * @param {number} index 0 から 23 
+   * @param {number} index 0 から 9 
    * @param {number} down 0 - 1
    */
   setButton(index, down) {
-    if (index < 0 || index >= 24) {
+    if (index < 0 || index > 9) {
       return;
     }
     const mod = index & 7;
-    const index8 = (index >> 8);
+    const index8 = (index >> 3);
     const shift = mod;
-    let val = this.report[index8];
+    let val = this.report[12 + index8];
     val = val & (0xff ^ (1 << shift));
-    this.report[index8] = val | (down << shift);
+    this.report[12 + index8] = val | (down << shift);
   }
 
 }

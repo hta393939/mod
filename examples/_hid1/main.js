@@ -55,9 +55,12 @@ class MediaBehavior extends Behavior {
           if (up === 0) {
             return;
           }
-          _ble.setAxis(6, 0.5);
-          _ble.setAxis(7, -0.5);
+          _ble.setPNAxis(1, -0.5);
+          _ble.setAxis(6, 0.125);
+          _ble.setAxis(7, 0.75);
+          _ble.setAxis(8, 0.25);
           _ble.setButton(0, 1);
+          _ble.setButton(1, 1);
           _ble.setHat(0, 2);
         };
       }
@@ -67,15 +70,20 @@ class MediaBehavior extends Behavior {
           if (up === 0) {
             return;
           }
-          _ble.setAxis(0, -0.5);
-          _ble.setButton(1, 1);
+          _ble.setPNAxis(0, -0.5);
+          _ble.setButton(23, 1);
           _ble.setHat(1, 4);
+
+
         };
       }
       if (c) {
         c.onChanged = function() {
           const up = this.read();
           if (up === 0) {
+            _ble.setButton(16, 1);
+            _ble.setButton(24, 0);
+
             return;
           }
           trace(`c up`);

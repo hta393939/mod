@@ -16,7 +16,7 @@
 				"type": "Array",
 				"permissions": "readEncrypted,writeEncrypted",
 				"properties": "read",
-				"value": [0,4,94,7,165,0,3]
+				"value": [0,4,94,142,2,0,1]
 			}
 		}
 	}

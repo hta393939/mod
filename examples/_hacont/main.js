@@ -12,7 +12,7 @@
  *
  */
 
-import {default as KeyboardService, HID_MODIFIERS} from "keyboardService";
+import {default as KeyboardService} from "keyboardService";
 import Modules from "modules";
 
 const BLUE = "blue";
@@ -27,7 +27,7 @@ class MediaBehavior extends Behavior {
 
     if (Modules.has("UI")) {
       globalThis.modExport = Modules.importNow("UI");
-      this.UI = new modExport.container({modifiers: HID_MODIFIERS})
+      this.UI = new modExport.container({modifiers: null})
       application.add(this.UI);
     } else {
       application.add(new NoModUI());
@@ -55,10 +55,10 @@ class MediaBehavior extends Behavior {
           if (up === 0) {
             return;
           }
-          _ble.setAxis(6, 0.5);
-          _ble.setAxis(7, -0.5);
+          _ble.setAxis(2, 0.5);
+          _ble.setAxis(3, 0.5);
           _ble.setButton(0, 1);
-          _ble.setHat(0, 2);
+          _ble.setHat(2);
         };
       }
       if (b) {
@@ -67,9 +67,9 @@ class MediaBehavior extends Behavior {
           if (up === 0) {
             return;
           }
-          _ble.setAxis(0, -0.5);
+          _ble.setAxis(0, 0.5);
           _ble.setButton(1, 1);
-          _ble.setHat(1, 4);
+          _ble.setHat(4);
         };
       }
       if (c) {
@@ -92,7 +92,7 @@ const NoModUI = Container.template($ => ({
     Text($, {
       left: 0, right: 0, Style: OpenSans24,
       // 画面表示
-      string: "BLE HID Host installed.\nReady for mod." 
+      string: "hacon*#+=:; installed.\nReady for mod." 
     })
   ]
 }));

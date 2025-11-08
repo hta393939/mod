@@ -13,7 +13,7 @@
  */
 
 class HIDMedia {
-  static SLIDER_MAX = 65532;
+  static SLIDER_MAX = 32767;
   static PN_MAX = 32767;
   static UPN_OFFSET = 32768;
   static UPN_MAX = 65535;
@@ -60,7 +60,7 @@ class HIDMedia {
    * @param {number} val 0-15
    */
   setHat(index, val) {
-    if (index < 0 || index >= 2) {
+    if (index < 0 || index > 1) {
       return;
     }
     let val8 = this.report[21];
@@ -69,7 +69,7 @@ class HIDMedia {
     } else {
       val8 = (val8 & 0x0f) | (val << 4);
     }
-    this.report[21] = val;
+    this.report[21] = val8;
   }
 
   /**
@@ -82,7 +82,7 @@ class HIDMedia {
       return;
     }
     const mod = index & 7;
-    const index8 = (index >> 8);
+    const index8 = (index >> 3);
     const shift = mod;
     let val = this.report[index8];
     val = val & (0xff ^ (1 << shift));
