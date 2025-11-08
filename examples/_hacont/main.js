@@ -25,6 +25,9 @@ class MediaBehavior extends Behavior {
   onCreate(application, data) {
     this.data = data;
 
+    this.mode = 0;
+    this.submode = 0;
+
     if (Modules.has("UI")) {
       globalThis.modExport = Modules.importNow("UI");
       this.UI = new modExport.container({modifiers: null})
@@ -33,19 +36,37 @@ class MediaBehavior extends Behavior {
       application.add(new NoModUI());
     }
 
+    {
+      const np = globalThis.lights;
+      if (np) {
+        //np.fill(np.makeRGB(32,32,32));
+        //np.update();
+      }
+    }
+
     this.ble = new KeyboardService({
       onKeyboardBound: () => {
         if (this.UI)
           this.UI.delegate("onKeyboardBound");
+        const np = globalThis.lights;
+        if (np) {
+          np.setPixel(10, np.makeRGB(0,0,255));
+          np.setPixel(6, np.makeRGB(255,255,255));
+          np.update();
+        }
       },
       onKeyboardUnbound: () => {
         if (this.UI)
           this.UI.delegate("onKeyboardUnbound");
+        const np = globalThis.lights;
+        np?.setPixel(9, np?.makeRGB(255,0,0));
+        np?.update();
       }
     });
 
     {
       const _ble = this.ble;
+      const _this = this;
       const a = globalThis.button?.a;
       const b = globalThis.button?.b;
       const c = globalThis.button?.c;
@@ -55,35 +76,81 @@ class MediaBehavior extends Behavior {
           if (up === 0) {
             return;
           }
-          _ble.setAxis(2, 0.5);
-          _ble.setAxis(3, 0.5);
-          _ble.setButton(0, 1);
-          _ble.setHat(2);
+          _this.next();
         };
       }
       if (b) {
         b.onChanged = function() {
           const up = this.read();
-          if (up === 0) {
-            return;
+          switch (_this.mode) {
+          case 0:
+          case 2:
+          case 4:
+          case 6:
+            if (up === 1) {
+              _this.submodeNext();
+            } else {
+
+            }
+            break;
+          case 1:
+          case 3:
+          case 5:
+            break;
           }
-          _ble.setAxis(0, 0.5);
-          _ble.setButton(1, 1);
-          _ble.setHat(4);
         };
       }
       if (c) {
         c.onChanged = function() {
           const up = this.read();
-          if (up === 0) {
-            return;
+          trace(`c${up} ${_this.mode}`);
+          switch (_this.mode) {
+            case 0:
+            case 2:
+            case 4:
+            case 6:
+              if (up === 1) {
+                _ble.setAxis(2, 0.75);
+                _ble.setAxis(3, 0.75);
+                _ble.setButton(0, 0);
+                _ble.setButton(_this.submode, 0);
+                _ble.setHat(0);
+              } else {
+                _ble.setAxis(2, 0.5);
+                _ble.setAxis(3, 0.5);
+                _ble.setButton(0, 1);
+                _ble.setButton(_this.submode, 1);
+                _ble.setHat(1);
+              }
+              break;
+            case 1:
+            case 3:
+            case 5:
+              if (up === 1) {
+                _ble.setAxis(0, 0.25);
+                _ble.setAxis(5, 0);
+                _ble.setButton(9, 0);
+              } else {
+                _ble.setAxis(0, 1);
+                _ble.setAxis(5, 1);
+                _ble.setButton(9, 1);
+              }
+              break;
           }
-          trace(`c up`);
+
         }
       }
     }
   }
-  
+
+  next() {
+    this.mode = (this.mode + 1) % 7;
+  }
+
+  submodeNext() {
+    this.submode = (this.submode + 1) % 7;
+  }
+
 }
 
 const NoModUI = Container.template($ => ({

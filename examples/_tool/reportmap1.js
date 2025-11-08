@@ -2,11 +2,6 @@
 
 // @see https://github.com/nefarius/ViGEmBus/issues/40
 var reportmap1 = [
-  // generic
-  0x05, 0x01,
-  // game pad
-  0x09, 0x05,
-
 //// 追加
 
   // Consumer usage page
@@ -14,7 +9,7 @@ var reportmap1 = [
   // Consumer Control usage
 	0x09, 1,
 
-  // COLLECTION
+  // COLLECTION 🔊
 	0xa1, 1,
   // ID: 1
 	0x85, 1,
@@ -35,12 +30,16 @@ var reportmap1 = [
 						9,185,
   // Input (Data)
 	0x81, 2,
+  // 🔊
   0xc0,
 //// ここまで
 
-  // appli ◎
+  // generic
+  0x05, 0x01,
+  // game pad
+  0x09, 0x05,
+  // appli ◎🎮
   0xA1, 0x01,
-
   // IDのはず 追加した
   0x85, 2,
 
@@ -255,7 +254,7 @@ var reportmap1 = [
   0x95, 0x01,
   // Input (Data)
   0x81, 0x02,
-  // END COLLECTION ◎
+  // END COLLECTION ◎🎮
   0xC0
 ];
 console.log('reportmap1', 262, reportmap1.length);

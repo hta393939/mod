@@ -393,13 +393,13 @@ class Misc {
     };
     obj.value = [
 // (1) Generic Desktop
-                        5,1,
+5,1,
 // Usage 6 Keyboard in Generic. Game Pad は 5
-                        9,6,
+9,6,
 // Collection (Application) a1
-                        161,1,
+161, 1,
 // 確か識別用の数値 (1) 85
-                        133,1,
+133, 1,
 // Usage Page (Key Codes)
                         5,7,
 // Usage Minimum (224) 19
@@ -459,19 +459,20 @@ class Misc {
 // Usage Maxi 29
                         41,101,
 // Input 81 データ配列絶対値(0)
-                        129,0,
-
+129,0,
 // END
-                        192,
+192,
 
+
+//// 2つめのリポート
 // Usage Page (1) generic
-                        5, 1,
+5, 1,
 // Usage (5) Game Pad
-                        9, 5,
+9, 5,
 // Collection A1
-                        161, 1,
+161, 1,
 // 確か識別用の数値 (2) 85
-                        133, 2,
+133, 2,
 // Usage Page (ボタン)
                         5, 9,
 // ボタン 24個 Logical 0-1
@@ -554,10 +555,10 @@ class Misc {
             9, 0x39, // hat switch
             9, 0x3a, // hat switch 2 であってほしい
 // Input (Data, Var, Abs) 81 2 変数
-                        129,2,
+            129,2,
 
 // END
-                        192
+        192
     ];
     obj.maxBytes = obj.value.length;
     return obj;

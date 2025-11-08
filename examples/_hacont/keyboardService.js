@@ -43,7 +43,7 @@ class KeyboardService extends BLEServer {
   onDisconnected() {
     this.unboundCallback?.();
     this.mediaReportCharacteristic = null;
-    this.keyboardReportCharacteristic = null;
+    this.consumerMediaReportCharacteristic = null;
     this.startAdvertising({
       advertisingData: { flags: 6, completeName: this.deviceName,
         incompleteUUID16List:[uuid`1812`, uuid`180f`],
@@ -60,7 +60,7 @@ class KeyboardService extends BLEServer {
       }
     } else if ("consumermedia_input_report" == characteristic.name) {
       this.consumerMediaReportCharacteristic = characteristic;
-      trace(`keyboard report bound by request\n`);
+      trace(`consumer media report bound by request\n`);
       if (!this.bound) {
         this.bound = true;
         this.boundCallback?.();
