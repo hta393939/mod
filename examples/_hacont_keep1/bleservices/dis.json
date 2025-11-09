@@ -1,0 +1,23 @@
+{
+	"service": {
+		"uuid": "180A",
+		"characteristics": {
+			"manufacturer": {
+				"uuid": "2A29",
+				"maxBytes": 7,
+				"type": "String",
+				"permissions": "readEncrypted",
+				"properties": "read",
+				"value": "_hacont"
+			},
+			"PnP_ID": {
+				"uuid": "2A50",
+				"maxBytes": 7,
+				"type": "Array",
+				"permissions": "readEncrypted,writeEncrypted",
+				"properties": "read",
+				"value": [0,4,94,142,2,0,1]
+			}
+		}
+	}
+}

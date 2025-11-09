@@ -12,29 +12,79 @@
  *
  */
 
+// Application
+// @see https://github.com/Moddable-OpenSource/moddable/blob/public/modules/piu/MC/piuMC.js#L148
+
+// piu Application doc
+// @see https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md#application-object
+
+// Label は1行．
+// Text は複数行．
+
 import Modules from "modules";
+import Time from "timer";
 
 const BLUE = "blue";
+const OpenSans24 = Style.template({ font: "24px Open Sans",
+  color: BLUE });
+
+const _misc = {
+  _val: `${1}`,
+};
+
+const PortClass1 = Port.template($ => ({
+  top: 0, bottom: 180, left: 240, right: 0,
+  skin: new Skin({fill: 'gray'}),
+  Behavior: class extends Behavior {
+		onCreate(port, data) {
+			this.data = data;
+		}
+		onDraw(port) {
+			let x = 0, y = 0;
+			{
+				port.fillColor('black', x, y, 16, 16);
+				x += 16;
+				y += 16;
+			}
+      let text = `${this.data._val}`;
+      
+      //let size = _style1.measure(text);
+      let size = _misc._style1.measure(text);
+      const w = size.width;
+      const h = size.height;
+      port.drawStyle(text, _misc._style1, x, y, w, h, false, 1);
+		}
+	}
+}));
+
+const _fcontainer = ($) => {
+  const ret = {
+    Skin: BackgroundSkin, left: 0, right: 0, top: 0, bottom: 0,
+    contents: [
+      Text($, {left: 0, right: 0, Style: OpenSans24, string: `gui\ngui!`}),
+      Text($, {left: 0, right: 160, Style: OpenSans24, string: `2`}),
+      new PortClass1(_misc),
+    ]
+  };
+  _misc.contents = ret.contents;
+  return ret;
+};
+
+
 const WHITE = "white";
 
-const BackgroundSkin = Skin.template({ fill: WHITE });
-const OpenSans24 = Style.template({ font: "24px Open Sans", color: BLUE });
+const BackgroundSkin = Skin.template({ fill: 'red' });
 
 class MediaBehavior extends Behavior {
   onCreate(application, data) {
     this.data = data;
 
-    if (Modules.has("UI")) {
-      globalThis.modExport = Modules.importNow("UI");
-      this.UI = new modExport.container({hidKeys: KEYINFO, modifiers: HID_MODIFIERS})
-      application.add(this.UI);
+    const _style1 = new Style({ font: "24px Open Sans",
+      color: [BLUE, 'yellow', 'green'] });
+    _misc._style1 = _style1;
 
-      trace(`UI 234`);
-    } else {
-      application.add(new NoModUI());
-
-      trace(`no UI 235`);
-    }
+    application.add(new NoModUI());
+    trace(`no UI 235\n`);
 
     // 0-6
     this.mode = 0;
@@ -65,31 +115,35 @@ class MediaBehavior extends Behavior {
         }
       }
       if (c) {
-        this.ready();
-
         c.onChanged = function() {
           const up = this.read();
 
           trace(`c up ${up}`);
           if (up === 1) {
             _this.setNP(_this.npcols[1]);
+
+            trace (`c release, ${_misc.contents.length}`);
+            const port1 = _misc.contents[2];
+            if (port1) {
+              _misc._val = `123`;
+              port1.invalidate();
+            }
           }
         }
       }
+
+      let first = true;
+      Time.repeat(timer => {
+        if (first) {
+          first = false;
+          this.ready();
+        }
+      }, 1000);
 
     }
 
 
   }
-  doKeyDown(application, options){
-    trace(`do key down ${123}`);
-  }
-  doKeyUp(application, options) {
-    Console.line('do key up');
-  }
-  //doKeyTap(application, options) {
-    // 
-  //}
 
   setNP(col) {
     const np = globalThis.lights;
@@ -103,6 +157,8 @@ class MediaBehavior extends Behavior {
   }
 
   ready() {
+    trace(`ready`);
+
     const np = globalThis.lights;
     if (np) {
       const col = np.makeRGB(64, 64, 64);
@@ -116,36 +172,33 @@ class MediaBehavior extends Behavior {
       this.npcols = cols.map(col => np.makeRGB(...col));
     }
 
-    let firstA = true;
-    let firstB = true;
-    globalThis.accelerometer.onreading = (data) => {
-      if (firstA) {
-        firstA = false;
-        trace(`acceler ${data.y}`);
-      }
-    };
-    globalThis.gyro.onreading = (data) => {
-      if (firstB) {
-        firstB = false;
-        trace(`gyro ${data.x}`);
-      }
-    };
-    globalThis.accelerometer.start(30);
-    globalThis.gyro.start(30);
+    if (false) {
+      let firstA = false;
+      let firstB = false;
+      globalThis.accelerometer.onreading = (data) => {
+        if (firstA) {
+          firstA = false;
+          trace(`acceler ${data.y}`);
+        }
+      };
+      globalThis.gyro.onreading = (data) => {
+        if (firstB) {
+          firstB = false;
+          trace(`gyro ${data.x}`);
+        }
+      };
+      globalThis.accelerometer.start(30);
+      globalThis.gyro.start(30);
+    }
+
+    //const scr = globalThis.screen;
+    // 240, 320
+    //trace('scr', scr, scr?.width, scr?.height, '\n');
   }
 
 }
 
-const NoModUI = Container.template($ => ({
-  Skin: BackgroundSkin, left: 0, right: 0, top: 0, bottom: 0,
-  contents: [
-    Text($, {
-      left: 0, right: 0, Style: OpenSans24,
-      // 画面表示
-      string: "installed.\nReady for mod." 
-    })
-  ]
-}));
+const NoModUI = Container.template($ => (_fcontainer($)));
 
 const MediaController = Application.template($ => ({
   Skin: BackgroundSkin,
@@ -155,15 +208,11 @@ const MediaController = Application.template($ => ({
 
 export default function () {
 
-  // global とか globalThis そのものにアクセスできない感じ
-  try {
-    const buttonA = globalThis.button?.a;
-    trace(`buttonA ${buttonA}\n`);
-  } catch (ec) {
-    trace(`catch`, ec.message);
-  }
-
-  return new MediaController({  }, { commandListLength: 2448, displayListLength: 3072, touchCount: 1 });
+  return new MediaController({  }, // data
+    { commandListLength: 2448, displayListLength: 3072,
+      //touchCount: 1
+    }
+  );
 }
 
 // modules/drivers/neopixel

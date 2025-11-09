@@ -22,7 +22,8 @@ class Misc {
         type: "Uint8Array",
         permissions: "readEncrypted,writeEncrypted",
         properties: "read",
-        value: reportmap1,
+        value: reportmap2,
+        //value: reportmap1, // 6軸+10ボタン+1ボタン
       };
       const text = JSON.stringify(obj);
       console.log('_boxctrl', obj.maxBytes);

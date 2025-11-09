@@ -7,22 +7,34 @@
 	},
 	"include": [
 		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODDABLE)/modules/network/ble/manifest_server.json",
 		"$(MODDABLE)/examples/manifest_piu.json",
 		"$(MODULES)/base/modules/manifest.json"
 	],
 	"modules": {
 		"*": [
-			"./main"
+			"./main",
+			"./keyboardService",
+			"./hidkeyboard",
+			"./hidmedia"
 		]
 	},
 	"strip": [],
+	"ble":{
+		"*": [
+			"./bleservices/*"
+		]
+	},
 	"resources": {
         "*-alpha": [
             "$(MODDABLE)/examples/assets/fonts/OpenSans-Regular-24"
         ]
     },
 	"preload": [
-		"main"
+		"main",
+		"keyboardService",
+		"hidkeyboard",
+		"hidmedia"
 	],
 	"platforms": {
 		"lin": {
@@ -33,8 +45,7 @@
 		"esp32": {
 			"config": {
 				"rotation": 90,
-				"startupSound": false,
-				"useGyro": false
+				"startupSound": false
 			}
 		}
 	}

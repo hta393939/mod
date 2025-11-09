@@ -1,14 +1,31 @@
+/*
+ * Copyright (c) 2022 Moddable Tech, Inc.
+ *
+ *   This file is part of the Moddable SDK.
+ *
+ *   This work is licensed under the
+ *       Creative Commons Attribution 4.0 International License.
+ *   To view a copy of this license, visit
+ *       <http://creativecommons.org/licenses/by/4.0>.
+ *   or send a letter to Creative Commons, PO Box 1866,
+ *   Mountain View, CA 94042, USA.
+ *
+ */
 
 class HIDMedia {
   static XY_MAX = 65535;
   static Z_MAX = 1023;
 
   constructor() {
-    /** */
-    this.report = new Uint8Array(13);
+    /** 17バイト */
+    this.report = new Uint8Array(17);
 
-    // X,X,Y,Y,Rx,Rx,Ry,Ry,Z,Z: 10バイト
-    // h,b,b: 3バイト
+    // X,X,Y,Y,Rx,Rx,Ry,Ry,Z,Z,Rz,Rz: 12バイト
+    // b,b,h: 3バイト
+    // system ctrl system main menu: 1バイト
+    // battery strength: 1バイト
+    this.report[16] = 0x02;
+    // 計17バイト
 
     // output
     // 1バイト
@@ -19,12 +36,12 @@ class HIDMedia {
 
   /**
    * 
-   * @param {number} index 0 - 4
+   * @param {number} index 0 - 5
    * @param {number} inval 0.0 - 1.0
    * @returns 
    */
   setAxis(index, inval) {
-    if (index < 0 || index > 4) {
+    if (index < 0 || index > 5) {
       return;
     }
     let max = (index >= 4) ? HIDMedia.Z_MAX : HIDMedia.XY_MAX;
@@ -39,9 +56,9 @@ class HIDMedia {
    * @param {number} val 1-8
    */
   setHat(val) {
-    let val8 = this.report[10];
+    let val8 = this.report[14];
     val8 = (val8 & 0xf0) | val;
-    this.report[10] = val;
+    this.report[14] = val;
   }
 
   /**
@@ -56,9 +73,9 @@ class HIDMedia {
     const mod = index & 7;
     const index8 = (index >> 3);
     const shift = mod;
-    let val = this.report[11 + index8];
+    let val = this.report[12 + index8];
     val = val & (0xff ^ (1 << shift));
-    this.report[11 + index8] = val | (down << shift);
+    this.report[12 + index8] = val | (down << shift);
   }
 
 }

@@ -77,7 +77,6 @@ class MediaBehavior extends Behavior {
             return;
           }
           _this.next();
-          trace(`${_this.mode}`);
         };
       }
       if (b) {
