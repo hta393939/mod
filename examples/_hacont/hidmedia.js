@@ -6,6 +6,7 @@ class HIDMedia {
   constructor() {
     /** */
     this.report = new Uint8Array(20);
+    this.report = new Uint8Array(17);
 
     // X,X,Y,Y,Rx,Rx,Ry,Ry,Z,Z,Rz,Rz: 12バイト
     // b,b,h: 3バイト
@@ -45,7 +46,7 @@ class HIDMedia {
   setHat(val) {
     let val8 = this.report[14];
     val8 = (val8 & 0xf0) | val;
-    this.report[14] = val;
+    this.report[14] = val8;
   }
 
   /**
