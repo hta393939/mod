@@ -5,10 +5,14 @@ class HIDMedia {
 
   constructor() {
     /** */
-    this.report = new Uint8Array(13);
+    this.report = new Uint8Array(20);
 
-    // X,X,Y,Y,Rx,Rx,Ry,Ry,Z,Z: 10バイト
-    // h,b,b: 3バイト
+    // X,X,Y,Y,Rx,Rx,Ry,Ry,Z,Z,Rz,Rz: 12バイト
+    // b,b,h: 3バイト
+    // 1bit: 1バイト
+    // バッテリー強度: 1バイト
+    // リザーブ: 3バイト
+
 
     // output
     // 1バイト
@@ -19,12 +23,12 @@ class HIDMedia {
 
   /**
    * 
-   * @param {number} index 0 - 4
+   * @param {number} index 0 - 5
    * @param {number} inval 0.0 - 1.0
    * @returns 
    */
   setAxis(index, inval) {
-    if (index < 0 || index > 4) {
+    if (index < 0 || index > 5) {
       return;
     }
     let max = (index >= 4) ? HIDMedia.Z_MAX : HIDMedia.XY_MAX;
@@ -39,9 +43,9 @@ class HIDMedia {
    * @param {number} val 1-8
    */
   setHat(val) {
-    let val8 = this.report[10];
+    let val8 = this.report[14];
     val8 = (val8 & 0xf0) | val;
-    this.report[10] = val;
+    this.report[14] = val;
   }
 
   /**
@@ -56,9 +60,9 @@ class HIDMedia {
     const mod = index & 7;
     const index8 = (index >> 3);
     const shift = mod;
-    let val = this.report[11 + index8];
+    let val = this.report[12 + index8];
     val = val & (0xff ^ (1 << shift));
-    this.report[11 + index8] = val | (down << shift);
+    this.report[12 + index8] = val | (down << shift);
   }
 
 }

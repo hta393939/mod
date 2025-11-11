@@ -21,6 +21,10 @@ const WHITE = "white";
 const BackgroundSkin = Skin.template({ fill: WHITE });
 const OpenSans24 = Style.template({ font: "24px Open Sans", color: BLUE });
 
+const _misc = {
+  temp: {},
+};
+
 class MediaBehavior extends Behavior {
   onCreate(application, data) {
     this.data = data;
@@ -51,7 +55,7 @@ class MediaBehavior extends Behavior {
         const np = globalThis.lights;
         if (np) {
           np.setPixel(10, np.makeRGB(0,0,255));
-          np.setPixel(6, np.makeRGB(255,255,255));
+          np.setPixel(6, np.makeRGB(0,255,0)); // 6は手前
           np.update();
         }
       },
@@ -77,7 +81,7 @@ class MediaBehavior extends Behavior {
             return;
           }
           _this.next();
-          trace(`${_this.mode}`);
+          trace(`${_this.mode}\n`);
         };
       }
       if (b) {
@@ -160,7 +164,7 @@ const NoModUI = Container.template($ => ({
     Text($, {
       left: 0, right: 0, Style: OpenSans24,
       // 画面表示
-      string: "hacon*#+=:; installed.\nReady for mod." 
+      string: "hacon1 installed.\nReady for mod." 
     })
   ]
 }));
@@ -171,5 +175,7 @@ const MediaController = Application.template($ => ({
 }));
 
 export default function () {
-  return new MediaController({  }, { commandListLength: 2448, displayListLength: 3072, touchCount: 1 });
+  return new MediaController({  }, {
+    commandListLength: 2448,
+    displayListLength: 3072, touchCount: 1 });
 }

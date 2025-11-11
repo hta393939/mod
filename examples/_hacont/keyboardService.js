@@ -95,10 +95,12 @@ class KeyboardService extends BLEServer {
   }
   /** API */
   notifyMedia() {
-    if (this.mediaReportCharacteristic)
+    if (this.mediaReportCharacteristic) {
       this.notifyValue(this.mediaReportCharacteristic, this.media.report);
-    else
+      trace(`connected: ${this.media.report}\n`);
+    } else {
       trace(`not connected: ${this.media.report}\n`);
+    }
   }
 
   setAxis(index, inval) {
