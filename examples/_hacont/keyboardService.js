@@ -14,14 +14,14 @@
 
 import BLEServer from "bleserver";
 import { uuid } from "btutils";
-import {HIDKeyboard} from "hidkeyboard";
+
 import {HIDMedia} from "hidmedia";
 
 class KeyboardService extends BLEServer {
   constructor(options) {
     super(options);
 
-    this.consumerMedia = new HIDKeyboard();
+
     this.media = new HIDMedia();
     this.bound = false;
 

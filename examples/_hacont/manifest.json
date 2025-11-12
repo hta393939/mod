@@ -7,6 +7,8 @@
 	},
 	"include": [
 		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODDABLE)/modules/network/wifi/manifest.json",
+		"$(MODDABLE)/examples/manifest_net.json",
 		"$(MODDABLE)/modules/network/ble/manifest_server.json",
 		"$(MODDABLE)/examples/manifest_piu.json",
 		"$(MODULES)/base/modules/manifest.json"
@@ -16,7 +18,12 @@
 			"./main",
 			"./keyboardService",
 			"./hidkeyboard",
-			"./hidmedia"
+			"./hidmedia",
+			"$(MODULES)/network/websocket/*",
+			"$(MODULES)/data/base64/*",
+			"$(MODULES)/data/logical/*",
+			"$(MODULES)/crypt/digest/*",
+			"$(MODULES)/crypt/digest/kcl/*"
 		]
 	},
 	"strip": [],
@@ -34,7 +41,11 @@
 		"main",
 		"keyboardService",
 		"hidkeyboard",
-		"hidmedia"
+		"hidmedia",
+		"websocket",
+		"base64",
+		"digest",
+		"logical"
 	],
 	"platforms": {
 		"lin": {
@@ -44,6 +55,8 @@
 		},
 		"esp32": {
 			"config": {
+				"ssid": "",
+				"password": "",
 				"rotation": 90,
 				"startupSound": false
 			}

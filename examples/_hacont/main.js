@@ -14,6 +14,8 @@
 
 import {default as KeyboardService} from "keyboardService";
 import Modules from "modules";
+import { NetAccess } from "./hidkeyboard";
+import config from "mc/config";
 
 const BLUE = "blue";
 const WHITE = "white";
@@ -146,6 +148,20 @@ class MediaBehavior extends Behavior {
         }
       }
     }
+
+    /*
+    Timer.set(() => {
+      const netaccess = new NetAccess();
+      netaccess.setInfo({
+        address: `192.168.0.9`,
+      });
+      netaccess.scan({
+        ssid: config.ssid,
+        password: config.password,
+      });
+    }, 1);
+    */
+
   }
 
   next() {
