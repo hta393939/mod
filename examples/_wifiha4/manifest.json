@@ -1,0 +1,56 @@
+{
+	"build": {
+		"PARTITIONS_FILE": "./sdkconfig/partitions.csv"
+	},
+	"defines": {
+		"XS_MODS": 1
+	},
+	"include": [
+		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODDABLE)/modules/network/wifi/manifest.json",
+		"$(MODDABLE)/examples/manifest_net.json",
+		"$(MODDABLE)/examples/manifest_piu.json",
+		"$(MODULES)/base/modules/manifest.json"
+	],
+	"modules": {
+		"*": [
+			"$(MODULES)/network/websocket/*",
+			"$(MODULES)/data/base64/*",
+			"$(MODULES)/data/logical/*",
+			"$(MODULES)/crypt/digest/*",
+			"$(MODULES)/crypt/digest/kcl/*",
+			"./hidkeyboard",
+			"./main"
+		]
+	},
+	"strip": [],
+	"resources": {
+        "*-alpha": [
+            "$(MODDABLE)/examples/assets/fonts/OpenSans-Regular-24"
+        ]
+    },
+	"preload": [
+		"base64",
+		"digest",
+		"logical",
+		"websocket",
+		"hidkeyboard",
+		"main"
+	],
+	"platforms": {
+		"lin": {
+			"config": {
+				"rotation": 0
+			}
+		},
+		"esp32": {
+			"config": {
+				"ssid": "",
+				"password": "",
+				"sntp": false,
+				"rotation": 90,
+				"startupSound": false
+			}
+		}
+	}
+}
