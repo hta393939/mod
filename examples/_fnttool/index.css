@@ -1,0 +1,11 @@
+
+.pointer {
+  cursor: pointer;
+}
+
+.drop {
+  border: dashed 4px black;
+  font-weight: bold;
+  text-align: center;
+  padding: 2em;
+}
