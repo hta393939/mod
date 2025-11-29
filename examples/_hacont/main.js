@@ -10,22 +10,58 @@
  *   or send a letter to Creative Commons, PO Box 1866,
  *   Mountain View, CA 94042, USA. 
  *
+ * 
+ * This code is a modified version of the above work.
+ * hta393939
+ * Button action, etc.
  */
 
 import {default as KeyboardService} from "keyboardService";
 import Modules from "modules";
-import { NetAccess } from "./hidkeyboard";
 import config from "mc/config";
 
-const BLUE = "blue";
-const WHITE = "white";
+const SCRW = 320;
+const SCRH = 240;
+const LINEH = 30;
 
-const BackgroundSkin = Skin.template({ fill: WHITE });
-const OpenSans24 = Style.template({ font: "24px Open Sans", color: BLUE });
+const BackgroundSkin = Skin.template({ fill: 'black' });
 
 const _misc = {
   temp: {},
+  mode: 0,
 };
+
+
+const CenterPortClass = Port.template($ => {
+  const top = + ($.y || 0);
+  const bottom = SCRH - (top + $.height);
+  const left = + ($.x || 0);
+  const right = SCRW - (left + $.width);
+  const frontcol = $.frontcol ?? '#ffffff';
+  const backcol = $.backcol ?? '#000000';
+  const style = new Style({font: "24px Open Sans"});
+  return {
+    top, bottom, left, right,
+    skin: new Skin({fill: backcol}),
+    Behavior: class extends Behavior {
+      onCreate(target, data) {
+        target.string = data?.string || '';
+      }
+      onDraw(target) {
+        let y = 0;
+        let text = target.string;
+        let size = style.measure(text);
+        const w = size.width;
+        const h = size.height;
+        let x = ($.width - w) / 2;
+        //y = ($.height - h) / 2;
+        //y = LINEH * 0.5;
+        target.drawString(text, style, frontcol, x, y, w, h);
+      }
+    }
+  };
+});
+
 
 class MediaBehavior extends Behavior {
   onCreate(application, data) {
@@ -166,24 +202,70 @@ class MediaBehavior extends Behavior {
 
   next() {
     this.mode = (this.mode + 1) % 7;
+    const port = _misc.contents[0];
+    if (!port) {
+      return;
+    }
+    port.string = `${this.mode * 100}`;
+    port.invalidate();
   }
 
   submodeNext() {
     this.submode = (this.submode + 1) % 7;
+    const port = _misc.contents[1];
+    if (!port) {
+      return;
+    }
+    port.string = `${this.submode}`;
+    port.invalidate();
   }
 
 }
 
-const NoModUI = Container.template($ => ({
-  Skin: BackgroundSkin, left: 0, right: 0, top: 0, bottom: 0,
-  contents: [
-    Text($, {
-      left: 0, right: 0, Style: OpenSans24,
-      // 画面表示
-      string: "hacon1 installed.\nReady for mod." 
-    })
-  ]
-}));
+
+const _fcontainer = ($) => {
+  trace(`_fcontainer, ${$?._foo}\n`);
+  const ret = {
+    Skin: BackgroundSkin,
+    left: 0, right: 0, top: 0, bottom: 0,
+    contents: [],
+  };
+  _misc.y = SCRH - LINEH;
+  _misc.width = SCRW;
+  _misc.height = LINEH;
+
+  ret.contents.push(new CenterPortClass({
+    x: SCRW * 0,
+    y: LINEH * 7,
+    width: SCRW * 0.25,
+    height: LINEH,
+    frontcol: '#ccc',
+    backcol: '#0000ff',
+  }));
+
+  ret.contents.push(new CenterPortClass({
+    x: SCRW * 6 / 16,
+    y: LINEH * 7,
+    width: SCRW / 4,
+    height: LINEH,
+    frontcol: '#ccc',
+    backcol: '#ff0000',
+  }));
+
+  ret.contents.push(new CenterPortClass({
+    x: SCRW * 12 / 16,
+    y: LINEH * 7,
+    width: SCRW * 0.25,
+    height: LINEH,
+    frontcol: '#000',
+    backcol: '#0f0',
+  }));
+
+  _misc.contents = ret.contents;
+  return ret;
+};
+
+const NoModUI = Container.template($ => _fcontainer($));
 
 const MediaController = Application.template($ => ({
   Skin: BackgroundSkin,

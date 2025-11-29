@@ -1,19 +1,7 @@
 
 class Misc {
-  constructor() {
-
-  }
-
   async init() {
-    //this.convertTo();
-
-    if (false) {
-      const obj = this.setPad();
-      const text = JSON.stringify(obj);
-      console.log('convertTo', obj.maxBytes);
-      console.log(text);
-      await navigator.clipboard.writeText(text);
-    }
+    this.hexToD();
 
     {
       const obj = {
@@ -31,48 +19,6 @@ class Misc {
       console.log(text);
       await navigator.clipboard.writeText(text);
     }
-  }
-
-  async convertTo() {
-    const obj = {
-      uuid: "2A4B",
-      maxBytes: 0,
-      type: "Uint8Array",
-      permission: "readEncrypted,writeEncrypted",
-      properties: "read",
-      value: [],
-    };
-    const lines = this.set().split('\n');
-    for (const line of lines) {
-      if (line == '') {
-        continue;
-      }
-      if (line.startsWith('#')) {
-        continue;
-      }
-
-      const ss = line.trim().split(' ');
-      for (const one of ss) {
-        let val = null;
-        if (one == '') {
-          continue;
-        }
-        if (one.startsWith('0x')) {
-          val = Number.parseInt(one.slice(2), 16);
-        } else {
-          val = Number.parseInt(one);
-        }
-        if (Number.isFinite(val)) {
-          obj.value.push(val);
-        }
-      }
-    }
-    obj.maxBytes = obj.value.length;
-
-    const text = JSON.stringify(obj);
-    console.log('convertTo', obj.maxBytes);
-    console.log(text);
-    await navigator.clipboard.writeText(text);
   }
 
   /** ble サンプルの分解例 */
@@ -564,6 +510,26 @@ class Misc {
     ];
     obj.maxBytes = obj.value.length;
     return obj;
+  }
+
+  hexToD() {
+    const el = document.getElementById('hex');
+    const viewel = document.getElementById('hexview');
+    const _update = () => {
+      const text = el.value;
+      const val = Number.parseInt(text, 16);
+      const u16 = new Uint16Array(64);
+      u16[0] = val;
+      const p = new DataView(u16.buffer);
+      const bs = [p.getUint8(0), p.getUint8(1)];
+
+      const str = `${bs[0]}, ${bs[1]}`;
+      viewel.textContent = str;
+      //navigator.clipboard.writeText(str);
+      console.log('hexToD', str);
+    };
+    el.addEventListener('input', _update);
+    _update();
   }
 
 }

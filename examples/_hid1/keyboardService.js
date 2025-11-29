@@ -10,12 +10,16 @@
  *   or send a letter to Creative Commons, PO Box 1866,
  *   Mountain View, CA 94042, USA.
  *
+ * This code is a modified version of the above work.
+ * hta393939
+ * pad, media, keyboard, etc.
  */
 
 import BLEServer from "bleserver";
 import { uuid } from "btutils";
 import {HIDKeyboard, HID_MODIFIERS} from "hidkeyboard";
-import {HIDMedia} from "hidmedia";
+import {HIDMedia, KEYINFO} from "hidmedia";
+import {HIDPad} from 'hidpad';
 
 class KeyboardService extends BLEServer {
   constructor(options) {
@@ -23,17 +27,19 @@ class KeyboardService extends BLEServer {
 
     this.keyboard = new HIDKeyboard();
     this.media = new HIDMedia();
+    this.pad = new HIDPad();
     this.bound = false;
 
     this.boundCallback = options.onKeyboardBound;
     this.unboundCallback = options.onKeyboardUnbound;
   }
   onReady() {
-    this.deviceName = "Mhid1";
+    this.deviceName = "Mhid2";
     this.securityParameters = { encryption: true, bonding: true };
 
     this.keyboardReportCharacteristic = null;
     this.mediaReportCharacteristic = null;
+    this.padReportCharacteristic = null;
     this.onDisconnected();
   }
   onConnected() {
@@ -43,6 +49,7 @@ class KeyboardService extends BLEServer {
     this.unboundCallback?.();
     this.mediaReportCharacteristic = null;
     this.keyboardReportCharacteristic = null;
+    this.padReportCharacteristic = null;
     this.startAdvertising({
       advertisingData: { flags: 6, completeName: this.deviceName,
         incompleteUUID16List:[uuid`1812`, uuid`180f`],
@@ -51,7 +58,7 @@ class KeyboardService extends BLEServer {
   }
   onCharacteristicNotifyEnabled(characteristic) {
     if ("pad_input_report" == characteristic.name) {
-      this.mediaReportCharacteristic = characteristic;
+      this.padReportCharacteristic = characteristic;
       trace(`pad report bound by request\n`);
       if (!this.bound) {
         this.bound = true;
@@ -60,6 +67,13 @@ class KeyboardService extends BLEServer {
     } else if ("keyboard_input_report" == characteristic.name) {
       this.keyboardReportCharacteristic = characteristic;
       trace(`keyboard report bound by request\n`);
+      if (!this.bound) {
+        this.bound = true;
+        this.boundCallback?.();
+      }
+    } else if ('media_input_report' == characteristic.name) {
+      this.mediaReportCharacteristic = characteristic;
+      trace(`media report bound by request\n`);
       if (!this.bound) {
         this.bound = true;
         this.boundCallback?.();
@@ -73,11 +87,13 @@ class KeyboardService extends BLEServer {
   }
   /** キャラクタ読み取り要求があったときの動作 */
   onCharacteristicRead(characteristic) {
-    switch (characteristic.name){
+    switch (characteristic.name) {
       case "pad_input_report":
-        return this.media.report;
+        return this.pad.report;
       case "keyboard_input_report":
         return this.keyboard.report;
+      case 'media_input_report':
+        return this.media.report;
       case "control_point":
         return [0,0];
       default:
@@ -98,6 +114,14 @@ class KeyboardService extends BLEServer {
     else
       trace(`not connected: ${this.media.report}\n`);
   }
+  notifyPad() {
+    if (this.padReportCharacteristic)
+      this.notifyValue(this.padReportCharacteristic, this.pad.report);
+    else
+      trace(`not connected: ${this.pad.report}\n`);
+  }
+
+
   onKeyUp(options) {    
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyUp(options);
@@ -112,20 +136,20 @@ class KeyboardService extends BLEServer {
   }
 
   setPNAxis(index, inval) {
-    this.media?.setPNAxis(index, inval);
-    this.notifyMedia();
+    this.pad?.setPNAxis(index, inval);
+    this.notifyPad();
   }
   setAxis(index, inval) {
-    this.media?.setAxis(index, inval);
-    this.notifyMedia();
+    this.pad?.setAxis(index, inval);
+    this.notifyPad();
   }
   setButton(index, down) {
-    this.media?.setButton(index, down);
-    this.notifyMedia();
+    this.pad?.setButton(index, down);
+    this.notifyPad();
   }
   setHat(index, val) {
-    this.media?.setHat(index, val);
-    this.notifyMedia();
+    this.pad?.setHat(index, val);
+    this.notifyPad();
   }
 
 }

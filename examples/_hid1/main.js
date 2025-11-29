@@ -10,6 +10,9 @@
  *   or send a letter to Creative Commons, PO Box 1866,
  *   Mountain View, CA 94042, USA. 
  *
+ * This code is a modified version of the above work.
+ * hta393939
+ * HID, etc.
  */
 
 import {default as KeyboardService, HID_MODIFIERS} from "keyboardService";
