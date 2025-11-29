@@ -1,3 +1,4 @@
+// こっちの方が新しい
 
 // @see https://www.angelcode.com/products/bmfont/doc/file_format.html
 
