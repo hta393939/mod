@@ -127,11 +127,19 @@ class KeyboardService extends BLEServer {
       this.keyboard.onKeyUp(options);
       this.notifyKeyboard();
     }
+    if (this.media.canHandle(options)) {
+      this.media.onKeyUp(options);
+      this.notifyMedia();
+    }
   }
   onKeyDown(options) { 
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyDown(options);
       this.notifyKeyboard();
+    }
+    if (this.media.canHandle(options)) {
+      this.media.onKeyDown(options);
+      this.notifyMedia();
     }
   }
 
@@ -154,4 +162,4 @@ class KeyboardService extends BLEServer {
 
 }
 
-export { KeyboardService as default, HID_MODIFIERS };
+export { KeyboardService as default, HID_MODIFIERS, KEYINFO };

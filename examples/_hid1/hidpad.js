@@ -16,9 +16,13 @@
  */
 
 class HIDPad {
+  /** 15bit */
   static SLIDER_MAX = 32767;
+  /** 振幅1.0相当 */
   static PN_MAX = 32767;
+  /** 0相当 */
   static UPN_OFFSET = 32768;
+  /** あくまで数値上の最大 */
   static UPN_MAX = 65535;
 
   constructor() {
@@ -35,14 +39,14 @@ class HIDPad {
     if (index < 0 || index > 5) {
       return;
     }
-    let val16 = Math.floor(inval * HIDMedia.PN_MAX) + HIDMedia.UPN_OFFSET;
-    val16 = Math.max(0, Math.min(HIDMedia.UPN_MAX, val16));
+    let val16 = Math.floor(inval * HIDPad.PN_MAX) + HIDPad.UPN_OFFSET;
+    val16 = Math.max(0, Math.min(HIDPad.UPN_MAX, val16));
     this.report[3 + index * 2] = val16 & 0xff;
     this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
   }
 
   /**
-   * 
+   * ダイヤルとスライダーだけ見えるがホイールは見えてない
    * @param {number} index 6 - 8
    * @param {number} inval 0.0 - 1.0
    * @returns 
@@ -51,8 +55,8 @@ class HIDPad {
     if (index < 6 || index > 8) {
       return;
     }
-    let val16 = Math.floor(inval * HIDMedia.SLIDER_MAX);
-    val16 = Math.max(0, Math.min(HIDMedia.SLIDER_MAX, val16));
+    let val16 = Math.floor(inval * HIDPad.SLIDER_MAX);
+    val16 = Math.max(0, Math.min(HIDPad.SLIDER_MAX, val16));
     this.report[3 + index * 2] = val16 & 0xff;
     this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
   }
