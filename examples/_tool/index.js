@@ -10,9 +10,10 @@ class Misc {
         type: "Uint8Array",
         permissions: "readEncrypted,writeEncrypted",
         properties: "read",
+        value: reportmap5,
         //value: reportmap2,
         //value: reportmap1, // 6軸+10ボタン+1ボタン
-        value: reportmap0, // 元のまま
+        //value: reportmap0, // 元のまま
       };
       const text = JSON.stringify(obj);
       console.log('_boxctrl', obj.maxBytes);

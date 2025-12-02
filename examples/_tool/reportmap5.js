@@ -1,6 +1,6 @@
 
 /**
- *
+ * key + pad + media, 現在はスライダーとダイヤルとスロットル
  */
 var reportmap5 = [
 // (1) Generic Desktop
@@ -144,9 +144,15 @@ var reportmap5 = [
 
 9,0x36, // slider
 9,0x37, // dial
-9,0x38, // wheel
+
+0x05, 0x02,
+0x09, 0xbb, // throttle
+//9,0x38, // wheel
+
 // Input (Data, Var, Abs) 81 2 変数
                         129,2,
+
+0x05, 0x01, // Genericに戻す
 
 // Logical Minimum (0) 15
                         0x15, 0,
@@ -163,19 +169,36 @@ var reportmap5 = [
 // Report Count (2) 95
                         0x95, 2,
 
-9, 0x39, // hat switch
-9, 0x3a, // hat switch 2 であってほしい
+0x09, 0x39, // hat switch
+0x09, 0x39, // hat switch 2 であってほしい
 // Input (Data, Var, Abs) 81 2 変数
 0x81, 2,
 
 // END
 0xc0,
 
+
 //// 3つめのリポート
-// 
-// 
-// 
-// END
+0x05, 12,
+0x09, 0x01,
+0xa1, 1,
+0x85, 3, // report id
+0x05, 12,
+0x15, 0,
+0x25, 1,
+
+0x75, 1,
+0x95, 8,
+
+9, 233,
+9, 234,
+9, 226,
+9, 182,
+9, 181,
+9, 176,
+9, 205,
+9, 185,
+0x81, 2,
 0xc0,
 
 ];

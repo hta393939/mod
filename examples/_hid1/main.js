@@ -105,43 +105,26 @@ class MediaBehavior extends Behavior {
       ble.setHat(1, 2);
     };
 
-    const _m20up = (srv) => {
+    const _code = (srv, hidCode, up) => {
       const opt = {
-        hidCode: KEYINFO.VALUMEDOWN.HID,
+        hidCode,
       };
-      srv.onKeyUp(opt);
-    };
-    const _m20down = (srv) => {
-      const opt = {
-        hidCode: KEYINFO.VALUMEDOWN.HID,
-      };
-      srv.onKeyDown(opt);
+      if (up) {
+        srv.onKeyUp(opt);
+      } else {
+        srv.onKeyDown(opt);
+      }
     };
 
-    const _m21up = (srv) => {
+    const _char = (srv, character, up) => {
       const opt = {
-        character: `\u000d`,
+        character,
       };
-      srv.onKeyUp(opt);
-    };
-    const _m21down = (srv) => {
-      const opt = {
-        character: `\u000d`,
-      };
-      srv.onKeyDown(opt);
-    };
-
-    const _m22up = (srv) => {
-      const opt = {
-        character: `a`,
-      };
-      srv.onKeyUp(opt);
-    };
-    const _m22down = (srv) => {
-      const opt = {
-        character: `a`,
-      };
-      srv.onKeyDown(opt);
+      if (up) {
+        srv.onKeyUp(opt);
+      } else {
+        srv.onKeyDown(opt);
+      }
     };
 
     {
@@ -204,23 +187,30 @@ class MediaBehavior extends Behavior {
             switch (_misc.submode) {
             case 0:
               if (up === 1) {
-                _m20up(_ble);
+                _char(_ble, '\u000d', true);
               } else {
-                _m20down(_ble);
+                _char(_ble, '\u000d', false);
               }
               break;
             case 1:
               if (up === 1) {
-                _m21up(_ble);
+                _char(_ble, 'a', true);
               } else {
-                _m21down(_ble);
+                _char(_ble, 'a', false);
               }
               break;
             case 2:
               if (up === 1) {
-                _m22up(_ble);
+                _code(_ble, KEYINFO.VALUME_DOWN.HID, true);
               } else {
-                _m22down(_ble);
+                _code(_ble, KEYINFO.VOLUME_DOWN.HID, false);
+              }
+              break;
+            case 3:
+              if (up === 1) {
+                _code(_ble, KEYINFO.VALUME_UP.HID, true);
+              } else {
+                _code(_ble, KEYINFO.VOLUME_UP.HID, false);
               }
               break;
             }
