@@ -97,6 +97,7 @@ class KeyboardService extends BLEServer {
       case 'media_input_report':
         return this.media.report;
       case "control_point":
+        trace(`control_point on read\n`);
         // NOTE: maxBytes=1なのになぜ2つなんだろう??
         return [0,0];
         //return [0,0,0];

@@ -130,11 +130,11 @@ var reportmap5 = [
 // Input (Data, Var, Abs) 81 2 変数
 0x81, 2,
 
-//// u15
+//// u15 00-7f の場合
 // Logical Minimum (0)
-0x16, 0x00, 0x00,
+//0x16, 0x00, 0x00,
 // Logical Maximum (32767)
-0x26, 0x00, 0x7f,
+//0x26, 0x00, 0x7f,
 
 // chrome だと中間が出ない
 // Physical Mini 0 最小値

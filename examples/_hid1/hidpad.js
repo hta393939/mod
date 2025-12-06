@@ -20,32 +20,28 @@ class HIDPad {
   static SLIDER_MAX = 32767;
   /** 振幅1.0相当 */
   static PN_MAX = 32767;
-  /** 0相当 */
-  //static UPN_OFFSET = 32768;
-  /** あくまで数値上の最大 */
-  //static UPN_MAX = 65535;
 
   constructor() {
     /** 22バイト */
     this.report = new Uint8Array(22);
+
+    this.setHat(0, 15);
+    this.setHat(1, 15);
   }
 
   /**
    * 
-   * @param {number} index 0 - 5
+   * @param {number} index 0 - 8 の9軸
    * @param {number} inval -1.0 - +1.0 
    */
   setPNAxis(index, inval) {
-    if (index < 0 || index > 5) {
+    if (index < 0 || index > 8) {
       return;
     }
 
     let val16 = Math.max(-HIDPad.PN_MAX,
       Math.min(+HIDPad.PN_MAX,
         inval * HIDPad.PN_MAX));
-    //this.report[3 + index * 2] = val16 & 0xff;
-    //this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
-
     const buf = new Int16Array(1);
     buf[0] = val16;
     const p = new DataView(buf.buffer);

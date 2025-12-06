@@ -17,6 +17,9 @@
 
 import {default as KeyboardService, HID_MODIFIERS, KEYINFO} from "keyboardService";
 import Modules from "modules";
+import { HID_SYSTEMREQUEST, HID_PRINTSCREEN } from "./hidkeyboard";
+
+import Time from 'time';
 
 const SCRW = 320;
 const SCRH = 240;
@@ -62,7 +65,7 @@ class MediaBehavior extends Behavior {
 
     application.add(new NoModUI());
 
-    this.ble = new KeyboardService({
+    application.ble = new KeyboardService({
       onKeyboardBound: () => {},
       onKeyboardUnbound: () => {}
     });
@@ -116,29 +119,22 @@ class MediaBehavior extends Behavior {
     };
 
     const _code = (srv, hidCode, up) => {
-      const opt = {
-        hidCode,
-      };
-      if (up) {
-        srv.onKeyUp(opt);
-      } else {
-        srv.onKeyDown(opt);
-      }
+      const opt = { hidCode };
+      if (up) { srv.onKeyUp(opt); } else { srv.onKeyDown(opt); }
+    };
+
+    const _direct = (srv, id, up) => {
+      const opt = { hidCode: { page: 7, id } };
+      if (up) { srv.onKeyUp(opt); } else { srv.onKeyDown(opt); }
     };
 
     const _char = (srv, character, up) => {
-      const opt = {
-        character,
-      };
-      if (up) {
-        srv.onKeyUp(opt);
-      } else {
-        srv.onKeyDown(opt);
-      }
+      const opt = { character };
+      if (up) { srv.onKeyUp(opt); } else { srv.onKeyDown(opt); }
     };
 
     {
-      const _ble = this.ble;
+      const _ble = application.ble;
       const a = globalThis.button?.a;
       const b = globalThis.button?.b;
       const c = globalThis.button?.c;
@@ -177,53 +173,49 @@ class MediaBehavior extends Behavior {
           const up = this.read();
           switch (_misc.mode) {
           case 0:
-          case 3:
-          case 6:
-            if (up === 1) {
-              _m00up(_ble);
-            } else {
-              _m00down(_ble);
-            }
+          case 5:
+            if (up === 1) { _m00up(_ble); } else { _m00down(_ble); }
             break;
           case 1:
-          case 4:
-            if (up === 1) {
-              _m10up(_ble);
-            } else {
-              _m10down(_ble);
-            }
+          case 6:
+            if (up === 1) { _m10up(_ble); } else { _m10down(_ble); }
             break;
           case 2:
             switch (_misc.submode) {
             case 0:
-              if (up === 1) {
-                _char(_ble, '\u000d', true);
-              } else {
-                _char(_ble, '\u000d', false);
-              }
+              _char(_ble, '\u000d', (up === 1));
               break;
             case 1:
-              if (up === 1) {
-                _char(_ble, 'a', true);
-              } else {
-                _char(_ble, 'a', false);
-              }
+              _char(_ble, 'a', (up === 1));
               break;
             case 2:
-              if (up === 1) {
-                _code(_ble, KEYINFO.VALUME_DOWN.HID, true);
-              } else {
-                _code(_ble, KEYINFO.VOLUME_DOWN.HID, false);
-              }
+              _code(_ble, KEYINFO.VOLUME_DOWN.HID, (up === 1));
               break;
             case 3:
-              if (up === 1) {
-                _code(_ble, KEYINFO.VALUME_UP.HID, true);
-              } else {
-                _code(_ble, KEYINFO.VOLUME_UP.HID, false);
-              }
+              _code(_ble, KEYINFO.VOLUME_UP.HID, (up === 1));
+              break;
+            case 4:
+              _direct(_ble, HID_SYSTEMREQUEST, (up === 1));
+              break;
+            case 5:
+              _direct(_ble, HID_PRINTSCREEN, (up === 1));
               break;
             }
+            break;
+          case 4:
+            switch (_misc.submode) {
+            case 0:
+            case 3:
+            case 6:
+              break;
+            case 1:
+            case 4:
+              break;
+            case 2:
+            case 5:
+              break;
+            }
+            break;
           }
 
         }
@@ -232,6 +224,48 @@ class MediaBehavior extends Behavior {
     }
   }
   
+  onDisplaying(content) {
+    content.start();
+  }
+  onTimeChanged(content) {
+    const port = _misc.contents[4];
+    if (port) {
+      let text = `${Time.ticks}`; // ミリ秒の差分用
+      port.string = text;
+      port.invalidate();
+    }
+
+    if (_misc.mode === 3) {
+      const ble = content.ble;
+      const _f = (tick) => {
+        const ang = tick * Math.PI * 2 / 1000 / 4;
+        return {cs: Math.cos(ang), sn: Math.sin(ang)};
+      };
+      switch (_misc.submode) {
+      case 0:
+      case 2:
+      case 4:
+      case 6:
+        {
+          const result = _f(Time.ticks);
+          ble.setPNAxis(0, result.cs);
+          ble.setPNAxis(1, result.sn);
+        }
+        break;
+      case 1:
+      case 3:
+      case 5:
+        {
+          const result = _f(Time.ticks);
+          ble.setPNAxis(2, result.cs);
+          ble.setPNAxis(5, result.sn);
+        }
+        break;
+      }
+    }
+
+  }
+
 }
 
 const _fcontainer = ($) => {
@@ -282,6 +316,16 @@ const _fcontainer = ($) => {
     string: 'hid1',
   }));
 
+  ret.contents.push(new CenterPortClass({
+    x: SCRW * 0.5,
+    y: LINEH * 3,
+    width: SCRW * 0.5,
+    height: LINEH,
+    frontcol: '#ffffff',
+    backcol: '#000000',
+    string: '-',
+  }));
+
   _misc.contents = ret.contents;
   return ret;
 };
@@ -289,6 +333,8 @@ const _fcontainer = ($) => {
 const NoModUI = Container.template($ => _fcontainer($));
 
 const MediaController = Application.template($ => ({
+  interval: 100, duration: 2500, loop: true,
+  active: true,
   Skin: Skin.template({ fill: 'black' }),
   Behavior: MediaBehavior
 }));

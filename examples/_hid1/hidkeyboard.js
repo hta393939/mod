@@ -10,6 +10,9 @@
  *   or send a letter to Creative Commons, PO Box 1866,
  *   Mountain View, CA 94042, USA.
  *
+ * This code is a modified version of the above work.
+ * hta393939
+ * system request, etc.
  */
 
 const HID_A = 0x04;
@@ -31,6 +34,9 @@ const HID_EQUAL = 0x2E;
 const HID_BACKSLASH = 0x31;
 const HID_SINGLEQUOTE = 0x34;
 const HID_COMMA = 0x36;
+
+const HID_PRINTSCREEN = 0x46;
+const HID_SYSTEMREQUEST = 0x84;
 
 const HID_MODIFIERS = Object.freeze({
   LEFT_CONTROL: 0b00000001,
@@ -190,4 +196,5 @@ class HIDKeyboard {
   }
 }
 
-export {HIDKeyboard, HID_MODIFIERS}
+export {HIDKeyboard, HID_MODIFIERS,
+  HID_SYSTEMREQUEST, HID_PRINTSCREEN}
