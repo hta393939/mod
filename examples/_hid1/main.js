@@ -68,7 +68,12 @@ class MediaBehavior extends Behavior {
     });
 
     const _m00up = (ble) => {
+      ble.setPNAxis(0, 0);
       ble.setPNAxis(1, 0);
+      ble.setPNAxis(2, 0);
+      ble.setPNAxis(3, 0);
+      ble.setPNAxis(4, 0);
+      ble.setPNAxis(5, 0);
       ble.setAxis(6, 0);
       ble.setAxis(7, 0);
       ble.setAxis(8, 0);
@@ -77,10 +82,15 @@ class MediaBehavior extends Behavior {
       ble.setHat(0, 15);
     };
     const _m00down = (ble) => {
+      ble.setPNAxis(0, -1);
       ble.setPNAxis(1, -0.5);
+      ble.setPNAxis(2, -0.25);
+      ble.setPNAxis(3, 0.25);
+      ble.setPNAxis(4, 0.5);
+      ble.setPNAxis(5, 1);
       ble.setAxis(6, 0.125);
-      ble.setAxis(7, 0.75);
-      ble.setAxis(8, 0.25);
+      ble.setAxis(7, 0.25);
+      ble.setAxis(8, 0.5);
       ble.setButton(0, 1);
       ble.setButton(1, 1);
       ble.setHat(0, 2);

@@ -21,9 +21,9 @@ class HIDPad {
   /** 振幅1.0相当 */
   static PN_MAX = 32767;
   /** 0相当 */
-  static UPN_OFFSET = 32768;
+  //static UPN_OFFSET = 32768;
   /** あくまで数値上の最大 */
-  static UPN_MAX = 65535;
+  //static UPN_MAX = 65535;
 
   constructor() {
     /** 22バイト */
@@ -39,10 +39,18 @@ class HIDPad {
     if (index < 0 || index > 5) {
       return;
     }
-    let val16 = Math.floor(inval * HIDPad.PN_MAX) + HIDPad.UPN_OFFSET;
-    val16 = Math.max(0, Math.min(HIDPad.UPN_MAX, val16));
-    this.report[3 + index * 2] = val16 & 0xff;
-    this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
+
+    let val16 = Math.max(-HIDPad.PN_MAX,
+      Math.min(+HIDPad.PN_MAX,
+        inval * HIDPad.PN_MAX));
+    //this.report[3 + index * 2] = val16 & 0xff;
+    //this.report[3 + index * 2 + 1] = (val16 >> 8) & 0xff; 
+
+    const buf = new Int16Array(1);
+    buf[0] = val16;
+    const p = new DataView(buf.buffer);
+    this.report[3 + index * 2] = p.getUint8(0);
+    this.report[3 + index * 2 + 1] = p.getUint8(1);
   }
 
   /**

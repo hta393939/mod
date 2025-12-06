@@ -6,7 +6,6 @@ class Misc {
     {
       const obj = {
         uuid: "2A4B",
-        maxBytes: reportmap0.length,
         type: "Uint8Array",
         permissions: "readEncrypted,writeEncrypted",
         properties: "read",
@@ -15,6 +14,8 @@ class Misc {
         //value: reportmap1, // 6軸+10ボタン+1ボタン
         //value: reportmap0, // 元のまま
       };
+      obj.maxBytes = obj.value.length;
+
       const text = JSON.stringify(obj);
       console.log('_boxctrl', obj.maxBytes);
       console.log(text);

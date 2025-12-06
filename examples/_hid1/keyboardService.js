@@ -21,6 +21,8 @@ import {HIDKeyboard, HID_MODIFIERS} from "hidkeyboard";
 import {HIDMedia, KEYINFO} from "hidmedia";
 import {HIDPad} from 'hidpad';
 
+const deviceName = 'Moddable pad 01';
+
 class KeyboardService extends BLEServer {
   constructor(options) {
     super(options);
@@ -34,7 +36,7 @@ class KeyboardService extends BLEServer {
     this.unboundCallback = options.onKeyboardUnbound;
   }
   onReady() {
-    this.deviceName = "Mhid2";
+    this.deviceName = deviceName;
     this.securityParameters = { encryption: true, bonding: true };
 
     this.keyboardReportCharacteristic = null;
@@ -95,7 +97,10 @@ class KeyboardService extends BLEServer {
       case 'media_input_report':
         return this.media.report;
       case "control_point":
+        // NOTE: maxBytes=1なのになぜ2つなんだろう??
         return [0,0];
+        //return [0,0,0];
+        //return [0];
       default:
         trace(`unhandled read of characteristic: ${characteristic.name}\n`);
         break;
