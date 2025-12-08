@@ -21,9 +21,19 @@ class HIDPad {
   /** 振幅1.0相当 */
   static PN_MAX = 32767;
 
+  static LEVEL_OFFSET = 3;
+  static AXIS_OFFSET = HIDPad.LEVEL_OFFSET + 0;
+  static HAT_OFFSET = HIDPad.AXIS_OFFSET + 18;
+
+  /* levelボタンチャレンジ
+  static LEVEL_OFFSET = 3;
+  static AXIS_OFFSET = HIDPad.LEVEL_OFFSET + 4;
+  static HAT_OFFSET = HIDPad.AXIS_OFFSET + 18;
+  */
+
   constructor() {
     /** 22バイト */
-    this.report = new Uint8Array(22);
+    this.report = new Uint8Array(HIDPad.HAT_OFFSET + 1);
 
     this.setHat(0, 15);
     this.setHat(1, 15);
@@ -45,8 +55,8 @@ class HIDPad {
     const buf = new Int16Array(1);
     buf[0] = val16;
     const p = new DataView(buf.buffer);
-    this.report[3 + index * 2] = p.getUint8(0);
-    this.report[3 + index * 2 + 1] = p.getUint8(1);
+    this.report[HIDPad.AXIS_OFFSET + index * 2] = p.getUint8(0);
+    this.report[HIDPad.AXIS_OFFSET + index * 2 + 1] = p.getUint8(1);
   }
 
   /**
@@ -75,12 +85,12 @@ class HIDPad {
       return;
     }
     let val8 = this.report[21];
-    if (index === 0) {
-      val8 = (val8 & 0xf0) | val;
+    if (index === 1) {
+      val8 = (val8 & 0xf0) | val; // 下位
     } else {
-      val8 = (val8 & 0x0f) | (val << 4);
+      val8 = (val8 & 0x0f) | (val << 4); // 上位
     }
-    this.report[21] = val8;
+    this.report[HIDPad.HAT_OFFSET] = val8;
   }
 
   /**
@@ -98,6 +108,25 @@ class HIDPad {
     let val = this.report[index8];
     val = val & (0xff ^ (1 << shift));
     this.report[index8] = val | (down << shift);
+  }
+
+  /**
+   * 
+   * @param {number} index 0 or 1
+   * @param {number} val 0.0-1.0 
+   */
+  setLevelButton(index, inval) {
+    if (index < 0 || index > 1) {
+      return;
+    }
+    let val16 = Math.max(0,
+      Math.min(HIDPad.PN_MAX, inval * HIDPad.PN_MAX)
+    );
+    const buf = new Int16Array(1);
+    buf[0] = val16;
+    const p = new DataView(buf.buffer);
+    this.report[HIDPad.LEVEL_OFFSET + index * 2] = p.getUint8(0);
+    this.report[HIDPad.LEVEL_OFFSET + index * 2 + 1] = p.getUint8(1);
   }
 
 }

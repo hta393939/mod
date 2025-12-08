@@ -21,7 +21,7 @@ import {HIDKeyboard, HID_MODIFIERS} from "hidkeyboard";
 import {HIDMedia, KEYINFO} from "hidmedia";
 import {HIDPad} from 'hidpad';
 
-const deviceName = 'Moddable pad 01';
+const deviceName = 'adv pad 01';
 
 class KeyboardService extends BLEServer {
   constructor(options) {
@@ -107,6 +107,11 @@ class KeyboardService extends BLEServer {
         break;
     }
   }
+
+  onCharacteristicWrite(characteristic, vals) {
+    trace(`write`, characteristic, vals);
+  }
+
   notifyKeyboard() {
     if (this.keyboardReportCharacteristic)
       this.notifyValue(this.keyboardReportCharacteristic, this.keyboard.report);
@@ -116,19 +121,19 @@ class KeyboardService extends BLEServer {
   /** API */
   notifyMedia() {
     if (this.mediaReportCharacteristic)
-      this.notifyValue(this.mediaReportCharacteristic, this.media.report);
+      this.notifyValue(this.mediaReportCharacteristic, this.media?.report);
     else
-      trace(`not connected: ${this.media.report}\n`);
+      trace(`not connected: ${this.media?.report}\n`);
   }
   notifyPad() {
     if (this.padReportCharacteristic)
-      this.notifyValue(this.padReportCharacteristic, this.pad.report);
+      this.notifyValue(this.padReportCharacteristic, this.pad?.report);
     else
-      trace(`not connected: ${this.pad.report}\n`);
+      trace(`not connected: ${this.pad?.report}\n`);
   }
 
 
-  onKeyUp(options) {    
+  onKeyUp(options) {
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyUp(options);
       this.notifyKeyboard();
@@ -163,6 +168,10 @@ class KeyboardService extends BLEServer {
   }
   setHat(index, val) {
     this.pad?.setHat(index, val);
+    this.notifyPad();
+  }
+  setLevelButton(index, val) {
+    this.pad?.setLevelButton(index, val);
     this.notifyPad();
   }
 

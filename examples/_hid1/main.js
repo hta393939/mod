@@ -66,8 +66,22 @@ class MediaBehavior extends Behavior {
     application.add(new NoModUI());
 
     application.ble = new KeyboardService({
-      onKeyboardBound: () => {},
-      onKeyboardUnbound: () => {}
+      onKeyboardBound: () => {
+        const port = _misc.contents[5];
+        if (!port) {
+          return;
+        }
+        port.string = '><';
+        port.invalidate();
+      },
+      onKeyboardUnbound: () => {
+        const port = _misc.contents[5];
+        if (!port) {
+          return;
+        }
+        port.string = '//';
+        port.invalidate();
+      }
     });
 
     const _m00up = (ble) => {
@@ -82,6 +96,8 @@ class MediaBehavior extends Behavior {
       ble.setAxis(8, 0);
       ble.setButton(0, 0);
       ble.setButton(1, 0);
+      ble.setLevelButton(0, 0);
+      ble.setLevelButton(1, 0);
       ble.setHat(0, 15);
     };
     const _m00down = (ble) => {
@@ -96,6 +112,8 @@ class MediaBehavior extends Behavior {
       ble.setAxis(8, 0.5);
       ble.setButton(0, 1);
       ble.setButton(1, 1);
+      ble.setLevelButton(0, 1);
+      ble.setLevelButton(0, 0.5);
       ble.setHat(0, 2);
     };
 
@@ -115,7 +133,9 @@ class MediaBehavior extends Behavior {
       ble.setAxis(8, 0.25);
       ble.setButton(2, 1);
       ble.setButton(3, 1);
-      ble.setHat(1, 2);
+      ble.setLevelButton(0, 0.5001);
+      ble.setLevelButton(1, 0.4999);
+      ble.setHat(1, 3);
     };
 
     const _code = (srv, hidCode, up) => {
@@ -324,7 +344,17 @@ const _fcontainer = ($) => {
     frontcol: '#ffffff',
     backcol: '#000000',
     string: '-',
-  }));
+  })); // ticks
+
+  ret.contents.push(new CenterPortClass({
+    x: SCRW * 2 / 8,
+    y: LINEH * 5,
+    width: SCRW * 1 / 8,
+    height: LINEH,
+    frontcol: '#ffffff',
+    backcol: '#000000',
+    string: '-',
+  })); // #5
 
   _misc.contents = ret.contents;
   return ret;
