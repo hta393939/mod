@@ -9,11 +9,11 @@ class Misc {
         type: "Uint8Array",
         permissions: "readEncrypted,writeEncrypted",
         properties: "read",
-        //value: reportmap5,
+        //value: reportmap6,
+        value: reportmap5,
         //value: reportmap2,
         //value: reportmap1, // 6軸+10ボタン+1ボタン
         //value: reportmap0, // 元のまま
-        value: reportmap6,
       };
       obj.maxBytes = obj.value.length;
 

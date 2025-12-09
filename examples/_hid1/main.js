@@ -27,7 +27,7 @@ const LINEH = 30;
 
 const _misc = {
   mode: 0,
-  submode: 0,
+//  submode: 0,
 };
 
 const CenterPortClass = Port.template($ => {
@@ -61,6 +61,8 @@ const CenterPortClass = Port.template($ => {
 
 class MediaBehavior extends Behavior {
   onCreate(application, data) {
+    application.submode = 0;
+
     this.data = data;
 
     application.add(new NoModUI());
@@ -99,6 +101,7 @@ class MediaBehavior extends Behavior {
       ble.setLevelButton(0, 0);
       ble.setLevelButton(1, 0);
       ble.setHat(0, 15);
+      ble.notifyPad();
     };
     const _m00down = (ble) => {
       ble.setPNAxis(0, -1);
@@ -115,6 +118,7 @@ class MediaBehavior extends Behavior {
       ble.setLevelButton(0, 1);
       ble.setLevelButton(0, 0.5);
       ble.setHat(0, 2);
+      ble.notifyPad();
     };
 
     const _m10up = (ble) => {
@@ -125,6 +129,7 @@ class MediaBehavior extends Behavior {
       ble.setButton(2, 0);
       ble.setButton(3, 0);
       ble.setHat(1, 15);
+      ble.notifyPad();
     };
     const _m10down = (ble) => {
       ble.setPNAxis(0, 1);
@@ -136,6 +141,7 @@ class MediaBehavior extends Behavior {
       ble.setLevelButton(0, 0.5001);
       ble.setLevelButton(1, 0.4999);
       ble.setHat(1, 3);
+      ble.notifyPad();
     };
 
     const _code = (srv, hidCode, up) => {
@@ -179,12 +185,12 @@ class MediaBehavior extends Behavior {
           if (up === 1) {
             return;
           }
-          _misc.submode = (_misc.submode + 1) % 7;
+          application.submode = (application.submode + 1) % 7;
           const port = _misc.contents[1];
           if (!port) {
             return;
           }
-          port.string = `${_misc.submode}`;
+          port.string = `${application.submode}`;
           port.invalidate();
         };
       }
@@ -201,7 +207,7 @@ class MediaBehavior extends Behavior {
             if (up === 1) { _m10up(_ble); } else { _m10down(_ble); }
             break;
           case 2:
-            switch (_misc.submode) {
+            switch (application.submode) {
             case 0:
               _char(_ble, '\u000d', (up === 1));
               break;
@@ -223,7 +229,7 @@ class MediaBehavior extends Behavior {
             }
             break;
           case 4:
-            switch (_misc.submode) {
+            switch (application.submode) {
             case 0:
             case 3:
             case 6:
@@ -261,7 +267,7 @@ class MediaBehavior extends Behavior {
         const ang = tick * Math.PI * 2 / 1000 / 4;
         return {cs: Math.cos(ang), sn: Math.sin(ang)};
       };
-      switch (_misc.submode) {
+      switch (content.submode) {
       case 0:
       case 2:
       case 4:
@@ -270,6 +276,7 @@ class MediaBehavior extends Behavior {
           const result = _f(Time.ticks);
           ble.setPNAxis(0, result.cs);
           ble.setPNAxis(1, result.sn);
+          ble.notifyPad();
         }
         break;
       case 1:
@@ -279,6 +286,7 @@ class MediaBehavior extends Behavior {
           const result = _f(Time.ticks);
           ble.setPNAxis(2, result.cs);
           ble.setPNAxis(5, result.sn);
+          ble.notifyPad();
         }
         break;
       }
@@ -306,6 +314,7 @@ const _fcontainer = ($) => {
     height: LINEH,
     frontcol: '#ccc',
     backcol: '#0000ff',
+    string: '0'
   }));
 
   ret.contents.push(new CenterPortClass({
@@ -315,6 +324,7 @@ const _fcontainer = ($) => {
     height: LINEH,
     frontcol: '#ffffff',
     backcol: '#ff0000',
+    string: '0',
   }));
 
   ret.contents.push(new CenterPortClass({
@@ -370,5 +380,6 @@ const MediaController = Application.template($ => ({
 }));
 
 export default function () {
-  return new MediaController({  }, { commandListLength: 2448, displayListLength: 3072, touchCount: 1 });
+  return new MediaController({  },
+    { commandListLength: 2448, displayListLength: 3072, touchCount: 1 });
 }

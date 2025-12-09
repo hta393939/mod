@@ -102,8 +102,8 @@ var reportmap6 = [
 // Input (Data, Var, Abs) 81 2 変数
 0x81, 0x02,
 
-/*
-// ---- アナログボタン
+
+// ---- アナログボタン +4バイト
 0x15, 0, // Logical 0-
 0x26, 0xff, 0x7f, // Logical -32767
 0x19, 0x19, // Usage Mini
@@ -112,7 +112,7 @@ var reportmap6 = [
 0x95, 2, // 2個
 0x81, 0x02, // Input
 // ----
-*/
+
 
 // ボタンページのままではだめだ Generic Desktop を指定する
 0x05, 0x01,

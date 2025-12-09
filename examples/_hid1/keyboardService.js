@@ -125,6 +125,7 @@ class KeyboardService extends BLEServer {
     else
       trace(`not connected: ${this.media?.report}\n`);
   }
+  /** API */
   notifyPad() {
     if (this.padReportCharacteristic)
       this.notifyValue(this.padReportCharacteristic, this.pad?.report);
@@ -132,7 +133,7 @@ class KeyboardService extends BLEServer {
       trace(`not connected: ${this.pad?.report}\n`);
   }
 
-
+  /** notify もする */
   onKeyUp(options) {
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyUp(options);
@@ -143,6 +144,7 @@ class KeyboardService extends BLEServer {
       this.notifyMedia();
     }
   }
+  /** notify もする */
   onKeyDown(options) { 
     if (this.keyboard.canHandle(options)) {
       this.keyboard.onKeyDown(options);
@@ -156,23 +158,18 @@ class KeyboardService extends BLEServer {
 
   setPNAxis(index, inval) {
     this.pad?.setPNAxis(index, inval);
-    this.notifyPad();
   }
   setAxis(index, inval) {
     this.pad?.setAxis(index, inval);
-    this.notifyPad();
   }
   setButton(index, down) {
     this.pad?.setButton(index, down);
-    this.notifyPad();
   }
   setHat(index, val) {
     this.pad?.setHat(index, val);
-    this.notifyPad();
   }
   setLevelButton(index, val) {
     this.pad?.setLevelButton(index, val);
-    this.notifyPad();
   }
 
 }

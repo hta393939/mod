@@ -21,18 +21,22 @@ class HIDPad {
   /** 振幅1.0相当 */
   static PN_MAX = 32767;
 
+
+  static USE_LEVEL = false;
   static LEVEL_OFFSET = 3;
   static AXIS_OFFSET = HIDPad.LEVEL_OFFSET + 0;
   static HAT_OFFSET = HIDPad.AXIS_OFFSET + 18;
 
+
   /* levelボタンチャレンジ
+  static USE_LEVEL = true;
   static LEVEL_OFFSET = 3;
   static AXIS_OFFSET = HIDPad.LEVEL_OFFSET + 4;
   static HAT_OFFSET = HIDPad.AXIS_OFFSET + 18;
   */
 
   constructor() {
-    /** 22バイト */
+    /** 22バイト or 26バイト */
     this.report = new Uint8Array(HIDPad.HAT_OFFSET + 1);
 
     this.setHat(0, 15);
@@ -116,6 +120,10 @@ class HIDPad {
    * @param {number} val 0.0-1.0 
    */
   setLevelButton(index, inval) {
+    if (!HIDPad.USE_LEVEL) {
+      return;
+    }
+
     if (index < 0 || index > 1) {
       return;
     }
